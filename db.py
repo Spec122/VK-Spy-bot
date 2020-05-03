@@ -1,6 +1,8 @@
 import peewee
+from pathlib import Path
 from playhouse.sqlite_ext import SqliteExtDatabase
 
+Path("db").mkdir(exist_ok=True)
 db = SqliteExtDatabase('db/db.db', pragmas=(
     ('cache_size', -1024 * 128),
     ('journal_mode', 'wal'),

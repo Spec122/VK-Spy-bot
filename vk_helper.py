@@ -1,10 +1,11 @@
+import time
+
 import vk_api
-import json
+
 import exceptions
 from config import conf
 from db import Vk, Telegram
-from telegram import send_online_message
-import time
+import telegram
 
 
 class VkHelper:
@@ -47,7 +48,7 @@ class VkHelper:
                     first_name, last_name = user["first_name"], user["last_name"]
                     vk.last_seen = last_seen
                     vk.save()
-                    send_online_message(first_name, last_name, telegram_ids, platform)
+                    telegram.send_online_message(first_name, last_name, telegram_ids, platform)
                     time.sleep(60)
 
 

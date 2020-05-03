@@ -1,9 +1,10 @@
-import telebot
-import threading
-from config import conf
-import vk_helper
 import re
+
+import telebot
+
 import db
+import vk_helper
+from config import conf
 
 token = conf.read_config(["telegramtoken"])[0]
 bot = telebot.TeleBot(token)
@@ -37,6 +38,7 @@ def send_online_message(first_name, last_name, telegram_id, platform):
 def send_hello(message):
     bot.reply_to(message, "Приветствую друг!\nЯ помогу тебе отслеживать онлайн жертв\nВведите /spy что бы начать.")
 
+
 def spy_next_step(msg):
     short_name = re.search("vk.com\/(.*)", msg.text)
     if short_name is None:
@@ -50,8 +52,9 @@ def spy_next_step(msg):
 @bot.message_handler(commands=['spy'])
 def spy(message):
     msg = bot.reply_to(message, "Что бы начать следить за жертвой, отправьте ссылку на пользователя\nНапример "
-                          "https://vk.com/1")
+                                "https://vk.com/1")
     bot.register_next_step_handler(msg, spy_next_step)
+
 
 def go_polling():
     bot.polling(none_stop=True)

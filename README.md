@@ -4,7 +4,7 @@
   Уведомления приходят в Telegram.
 
 ## Установка
-1. git clone github.com/Spec122/VK-Spy-bot
+1. git clone https://github.com/Spec122/VK-Spy-bot.git
 1. pip install requirements.txt
 1. Отредактировать данные в config.ini
 1. python main.py

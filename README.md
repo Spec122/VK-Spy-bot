@@ -5,7 +5,7 @@
 
 ## Установка
 1. git clone https://github.com/Spec122/VK-Spy-bot.git
-1. pip install requirements.txt
+1. pip install -r requirements.txt
 1. Отредактировать данные в config.ini
 1. python main.py
 1. Перейти в диалог с ботом и следовать инструкции

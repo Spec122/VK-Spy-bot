@@ -36,7 +36,8 @@ def send_online_message(first_name, last_name, telegram_id, platform):
 
 @bot.message_handler(commands=['start', 'help'])
 def send_hello(message):
-    bot.reply_to(message, "Приветствую друг!\nЯ помогу тебе отслеживать онлайн жертв\nВведите /spy что бы начать.")
+    bot.reply_to(message, "Приветствую друг!\nЯ помогу тебе отслеживать онлайн жертв\nВведите /spy что бы "
+                          "начать.\nЧто-бы получить список отслеживаемых жертв /list")
 
 
 def spy_next_step(msg):
@@ -58,6 +59,19 @@ def spy(message):
     msg = bot.reply_to(message, "Что бы начать следить за жертвой, отправьте ссылку на пользователя\nНапример "
                                 "https://vk.com/1")
     bot.register_next_step_handler(msg, spy_next_step)
+
+@bot.message_handler(commands=['list'])
+def spy_list(message):
+    victims = ""
+    tg = db.Telegram.select().where(db.Telegram.telegram_id == message.chat.id)
+    if tg is None:
+        bot.reply_to(message, "У вас нет целей")
+    for i in tg:
+        vk_id = db.Vk.get(i.vk_id).vk_id
+        user = vk_helper.vk_session.get_user_info(users_ids=vk_id)
+        victims += user[0]["first_name"]+ " " + user[0]["last_name"] + "\n"
+    bot.reply_to(message, "Список жертв:\n{0}".format(victims))
+
 
 
 def go_polling():

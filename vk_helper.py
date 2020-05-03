@@ -19,7 +19,6 @@ class VkHelper:
         else:
             raise exceptions.NoCredentials
         self.vk_session = vk_session.get_api()
-        print("Successful auth")
 
     def get_id(self, shortname):
         user = self.vk_session.users.get(user_ids=shortname)
@@ -27,9 +26,11 @@ class VkHelper:
 
     def get_user_info(self, users_ids):
         user_ids = ""
-        for i in range(len(users_ids)):
-            user_ids += users_ids[i] + ","
-        # print(user_ids)
+        if isinstance(users_ids, list):
+            for i in range(len(users_ids)):
+                user_ids += users_ids[i] + ","
+        else:
+            user_ids = users_ids
         return self.vk_session.users.get(user_ids=user_ids, fields="online, last_seen")
 
     def check_online(self):
@@ -39,9 +40,7 @@ class VkHelper:
                 vk_ids.append(vk.vk_id)
 
             user_info = self.get_user_info(vk_ids)
-            # print(user_info)
             for user in user_info:
-                print(user["first_name"])
                 if user["online"]:
                     vk = Vk.get(vk_id=user["id"])
                     telegram_ids = []

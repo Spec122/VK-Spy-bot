@@ -43,9 +43,13 @@ def spy_next_step(msg):
     short_name = re.search("vk.com\/(.*)", msg.text)
     if short_name is None:
         return bot.reply_to(msg, "❌ Ой... Не верная ссылка")
-    user_id = vk_helper.vk_session.get_id(short_name)
-    vk = db.Vk.create(vk_id=user_id)
-    db.Telegram.create(telegram_id=msg.chat.id, vk=vk)
+    user_id = vk_helper.vk_session.get_id(short_name.group(1))
+    vk = db.Vk.get_or_none(vk_id=user_id)
+    if vk is None:
+        vk = db.Vk.create(vk_id=user_id)
+    tg = db.Telegram.get_or_none(telegram_id=msg.chat.id, vk=vk)
+    if tg is None:
+        db.Telegram.create(telegram_id=msg.chat.id, vk=vk)
     bot.reply_to(msg, "✅ ОК! Мы начали следить за жертвой.")
 
 

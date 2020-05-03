@@ -22,19 +22,26 @@ class VkHelper:
         print("Successful auth")
 
     def get_id(self, shortname):
-        user = self.vk_session.users.get(ids=shortname)
+        user = self.vk_session.users.get(user_ids=shortname)
         return user[0]["id"]
 
     def get_user_info(self, users_ids):
-        return self.vk_session.users.get(user_ids=users_ids, fields="online, last_seen")
+        user_ids = ""
+        for i in range(len(users_ids)):
+            user_ids += users_ids[i] + ","
+        # print(user_ids)
+        return self.vk_session.users.get(user_ids=user_ids, fields="online, last_seen")
 
     def check_online(self):
         while True:
             vk_ids = []
             for vk in Vk.select():
                 vk_ids.append(vk.vk_id)
+
             user_info = self.get_user_info(vk_ids)
+            # print(user_info)
             for user in user_info:
+                print(user["first_name"])
                 if user["online"]:
                     vk = Vk.get(vk_id=user["id"])
                     telegram_ids = []
@@ -42,15 +49,14 @@ class VkHelper:
                         telegram_ids.append(tg.telegram_id)
                     if user["last_seen"]["time"] == vk.last_seen:
                         continue
-                    if user["last_seen"]["time"] - int(vk.last_seen) < 300:
+                    if user["last_seen"]["time"] - int(vk.last_seen) < 200:
                         continue
                     last_seen, platform = user["last_seen"]["time"], user["last_seen"]["platform"]
                     first_name, last_name = user["first_name"], user["last_name"]
                     vk.last_seen = last_seen
                     vk.save()
                     telegram.send_online_message(first_name, last_name, telegram_ids, platform)
-                    time.sleep(60)
-
+        time.sleep(15)
 
 login, password, token, appid = \
     conf.read_config(["VKLOGIN", "VKPASSWORD", "ACCESSTOKEN", "APPID"])

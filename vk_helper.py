@@ -21,7 +21,10 @@ class VkHelper:
         self.vk_session = vk_session.get_api()
 
     def get_id(self, shortname):
-        user = self.vk_session.users.get(user_ids=shortname)
+        try:
+            user = self.vk_session.users.get(user_ids=shortname)
+        except vk_api.exceptions.ApiError:
+            return None
         return user[0]["id"]
 
     def get_user_info(self, users_ids):
@@ -43,13 +46,13 @@ class VkHelper:
             for user in user_info:
                 if user["online"]:
                     vk = Vk.get(vk_id=user["id"])
+                    if user["last_seen"]["time"] == vk.last_seen:
+                        continue
+                    if user["last_seen"]["time"] - int(vk.last_seen) < 360:
+                        continue
                     telegram_ids = []
                     for tg in Telegram.select().where(Telegram.vk == vk):
                         telegram_ids.append(tg.telegram_id)
-                    if user["last_seen"]["time"] == vk.last_seen:
-                        continue
-                    if user["last_seen"]["time"] - int(vk.last_seen) < 200:
-                        continue
                     last_seen, platform = user["last_seen"]["time"], user["last_seen"]["platform"]
                     first_name, last_name = user["first_name"], user["last_name"]
                     vk.last_seen = last_seen

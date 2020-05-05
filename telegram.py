@@ -44,7 +44,10 @@ def spy_next_step(msg):
     short_name = re.search("vk.com\/(.*)", msg.text)
     if short_name is None:
         return bot.reply_to(msg, "❌ Ой... Не верная ссылка")
+
     user_id = vk_helper.vk_session.get_id(short_name.group(1))
+    if user_id is None:
+        bot.reply_to(msg, "❌ Возможно страница не сущствует или удалена")
     vk = db.Vk.get_or_none(vk_id=user_id)
     if vk is None:
         vk = db.Vk.create(vk_id=user_id)
